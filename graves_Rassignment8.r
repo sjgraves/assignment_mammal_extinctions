@@ -9,6 +9,16 @@ library(dplyr)
 library(ggplot2)
 
 #### CUSTOM FUNCTIONS #####
+subset_mammal_data <- function(data){
+  # subset data frame to only include extinct and extant species groups
+  subset_data1 <- data[data$status == "extinct" | data$status == "extant",]
+  
+  subset_data2 <- subset_data1[subset_data1$continent != "Af",]
+  
+  return(subset_data2)
+}
+
+
 calculate_mean_mass_byGroups <- function(data, groups, type = "long"){
   # calcualtes the mean of the "combined_mass" column across different groups
   # NAs are removed from the calculation
@@ -24,8 +34,7 @@ calculate_mean_mass_byGroups <- function(data, groups, type = "long"){
     # http://stackoverflow.com/questions/21208801/group-by-multiple-columns-in-dplyr-using-string-vector-input
     group_by_(.dots = groups) %>% 
     summarize(mean_mass = mean(combined_mass, na.rm = T)) 
-  
-  mean_df <- mean_df[mean_df$status == "extant" | mean_df$status == "extinct",]
+
   
   # return output format based on designated type
   # long format is the output of the summarize function
@@ -59,6 +68,11 @@ colnames(mammal_sizes) <- c("continent", "status", "order",
                             "family", "genus", "species", "log_mass", "combined_mass", 
                             "reference")
 
+#### SUBSET DATA ####
+
+# use function to re-assign data object as a subset of the data
+mammal_sizes <- subset_mammal_data(mammal_sizes)
+
 
 #### CALCULATE MEAN MASS BY STATUS GROUP ####
 
@@ -75,6 +89,7 @@ mean_mass_byStatusContinent <- calculate_mean_mass_byGroups(mammal_sizes, groups
 
 # save the summary by status and continent to csv file
 write.csv(mean_mass_byStatusContinent,"data/continent_mass_differences.csv")
+
 
 
 
