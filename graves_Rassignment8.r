@@ -90,6 +90,24 @@ mean_mass_byStatusContinent <- calculate_mean_mass_byGroups(mammal_sizes, groups
 # save the summary by status and continent to csv file
 write.csv(mean_mass_byStatusContinent,"data/continent_mass_differences.csv")
 
+#### PLOT DISTRIBUTIONS OF DATA FOR EACH CONTINENT ####
+
+# remove entries in the EA and Oceanic continents
+mammal_sizes <- mammal_sizes[mammal_sizes$continent != "EA" & mammal_sizes$continent != "Oceanic",]
+
+h <- ggplot(mammal_sizes,aes(x=log_mass)) +
+  geom_histogram() +
+  # create a grid by continent and status
+  facet_grid(continent ~ status) +
+  # change x and y labels
+  labs(x="Log10(Mammal mass)", y="No. Species") +
+  # simplify theme
+  theme_bw()
+
+# save plot to png file
+png("size_distributions_byContinentStatus.png")
+h
+dev.off()
 
 
 
