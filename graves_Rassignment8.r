@@ -7,12 +7,19 @@
 #### LOAD PACKAGES #####
 library(dplyr)
 library(ggplot2)
+library(tidyr)
 
 #### CUSTOM FUNCTIONS #####
 subset_mammal_data <- function(data){
   # subset data frame to only include extinct and extant species groups
-  subset_data1 <- data[data$status == "extinct" | data$status == "extant",]
+  # input:
+  #   data = mammal size data frame. Must have columns of "status"and "continent"
   
+  # exclude data records that are not extinct or extant
+  subset_data1 <- data[data$status == "extinct" | data$status == "extant",]
+   
+  # exclude data records with "Af" as a column name
+  # this was done after I realized there was a lone Af in the data
   subset_data2 <- subset_data1[subset_data1$continent != "Af",]
   
   return(subset_data2)
@@ -59,7 +66,6 @@ calculate_mean_mass_byGroups <- function(data, groups, type = "long"){
 }
   
 
-
 #### LOAD DATA #####
 mammal_sizes <- read.csv("data/MOMv3.3.txt", header = F, sep = "\t", stringsAsFactors = F, na.strings = "-999")
 
@@ -74,14 +80,15 @@ colnames(mammal_sizes) <- c("continent", "status", "order",
 mammal_sizes <- subset_mammal_data(mammal_sizes)
 
 
-#### CALCULATE MEAN MASS BY STATUS GROUP ####
+#### problem 1.2. CALCULATE MEAN MASS BY STATUS GROUP ####
 
 # apply the custom function to generate table of mean mass by status group
 mean_mass_byStatus <- calculate_mean_mass_byGroups(mammal_sizes, groups = "status")
 
 mean_mass_byStatus
 
-#### CALCULATE MEAN MASS BY STATUS AND CONTINENT ####
+####  problem 1.3. CALCULATE MEAN MASS BY STATUS AND CONTINENT ####
+
 
 # apply the custom function to generate a table of the mean mass for extant and extinct species for each continent
 # use the wide format
@@ -90,7 +97,7 @@ mean_mass_byStatusContinent <- calculate_mean_mass_byGroups(mammal_sizes, groups
 # save the summary by status and continent to csv file
 write.csv(mean_mass_byStatusContinent,"data/continent_mass_differences.csv")
 
-#### PLOT DISTRIBUTIONS OF DATA FOR EACH CONTINENT ####
+#### problem 1.4. PLOT DISTRIBUTIONS OF DATA FOR EACH CONTINENT ####
 
 # remove entries in the EA and Oceanic continents
 mammal_sizes <- mammal_sizes[mammal_sizes$continent != "EA" & mammal_sizes$continent != "Oceanic",]
